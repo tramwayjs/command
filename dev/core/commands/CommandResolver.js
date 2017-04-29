@@ -1,6 +1,7 @@
 import Command from '../Command';
 import {errors} from 'tramway-core';
 let {WrongTypeError} = errors;
+import InputResolver from './InputResolver';
 
 export default class CommandResolver {
     /**
@@ -17,11 +18,13 @@ export default class CommandResolver {
         let options = this.getOptions(args);
 
         try {
-            let command = this.commands[commandName];
+            let command = new this.commands[commandName]();
             if (!(command instanceof Command)) {
                 throw new WrongTypeError(Command.name);
             } else {
-                command.action(args, options);
+                command.configure();
+                command = InputResolver.updateCommand(command, args, options);
+                command.action();
             }
         } catch (e) {
             if (e instanceof TypeError && e.message === "Cannot read property 'action' of undefined") {
