@@ -12,9 +12,7 @@ export default class InputResolver {
     static updateCommand(command, inputArgs, inputOptions) {
         let {args, options} = command.get();
 
-        let argNames = args.getOptionNames();
-        let opt = null, i = 0;
-
+        let i = 0;
         args.getOptions().forEach((option, key) => {
             let input = InputOption.array === option.getType() ? inputArgs : inputArgs[i++];
 
