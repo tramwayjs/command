@@ -15,21 +15,27 @@ export default class InputResolver {
         let argNames = args.getOptionNames();
         let opt = null, i = 0;
 
-        while(opt = argNames.next().value) {
-            if (InputOption.array === args.getOption(opt).getType()) {
-                args.update(opt, inputArgs);
-            } else {
-                args.update(opt, inputArgs[i++]);
+        args.getOptions().forEach((option, key) => {
+            let input = InputOption.array === option.getType() ? inputArgs : inputArgs[i++];
+
+            if (option.getRequired() && undefined === input) {
+                throw new Error(`The ${key} field is required and not set.`)
             }
-        }
 
-        argNames = options.getOptionNames();
-        while(opt = argNames.next().value) {
-            options.update(opt, inputOptions[opt]);
-        }
+            args.update(key, input);
+        });
 
-        command.update(args, options);
+        options.getOptions().forEach((option, key) => {
+            let valueIsUnset = undefined === inputOptions[key];
+            let valueNotSetForNonBooleanOrArray = inputOptions[key] && ![InputOption.array, InputOption.boolean].includes(option.getType()) && 0 === inputOptions[key].length;
 
-        return command;
+            if (option.getRequired() && (valueIsUnset || valueNotSetForNonBooleanOrArray)) {
+                throw new Error(`The ${key} field is required and not set.`)
+            }
+
+            options.update(key, inputOptions[key]);
+        });
+
+        return command.update(args, options);
     }
 }

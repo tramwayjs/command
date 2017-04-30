@@ -12,6 +12,9 @@ export default class CommandResolver {
         this.commands = commands || {};
     }
     
+    /**
+     * Prepares and executes the command
+     */
     run() {
         let args = process.argv.slice(2);
         const commandName = args.shift();

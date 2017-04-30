@@ -28,13 +28,6 @@ export default class InputOptions {
     }
 
     /**
-     * @returns {Iterator}
-     */
-    getOptionNames() {
-        return this.options.keys();
-    }
-
-    /**
      * @param {string} option 
      * @returns {InputOption}
      */
