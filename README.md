@@ -3,13 +3,13 @@ Tramway Command is a simple CLI building tool to write scripts to accompany a Tr
 1. A standard interface for writing commands.
 2. A flexible way to create multiple namespaces.
 3. An indexing system capable of plugging into tramway-core-dependency-injector and avoiding file clutter
-4. Flexible arguments parsing
+4. Control of argument names, types and if they're required
 
 # Installation:
 1. `npm install tramway-command`
 
 # Example project:
-https://gitlab.com/tramwayjs/tramway-example
+https://gitlab.com/tramwayjs/tramway-command-example
 
 # Documentation
 
@@ -21,9 +21,9 @@ https://gitlab.com/tramwayjs/tramway-example
 The config file for commands will contain a JSON hashmap of commands to a string representation.
 
 ```
-import {TestCommand} from '/commands/TestCommand';
+import TestCommand from '../commands/TestCommand';
 export default {
-    "test-command": new TestCommand()
+    "test:command": TestCommand
 };
 ```
 
@@ -33,11 +33,20 @@ Commands let you perform and automate tasks or create helpful utilities without 
 To create a command, import the class and implement a derived class with the abstracted stubs to get the most out of it. 
 
 ```
-import {Command} from 'tramway-command';
+import {Command, commands} from 'tramway-command';
+let {InputOption} = commands;
 
 export default class TestCommand extends Command {
-    action(args, options) {
-        console.log("Test command ran", args, options);
+    configure() {
+        this.args.add((new InputOption('input', InputOption.string)).isRequired());
+        this.options.add(new InputOption('str', InputOption.string));
+        this.options.add((new InputOption('num', InputOption.number)).isRequired());
+        this.options.add(new InputOption('arr', InputOption.array));
+        this.options.add(new InputOption('bool', InputOption.boolean));
+    }
+
+    action() {
+        console.log("Test command ran, here's some of what you gave it", this.arguments, this.options);
     }
 }
 ```
@@ -45,7 +54,26 @@ export default class TestCommand extends Command {
 | Function | Usage |
 | ----- | ----- |
 | ```constructor()``` | Handles any dependency injection that can instantiated in the index or using [`tramway-core-dependency-injector`](https://gitlab.com/tramwayjs/tramway-core-dependency-injector) |
-| ```action(args: [], options: {})``` | The main runner of the command, will be executed when the index maps the CLI to it. Arguments are passed as an ordered array and options are passed as a mapped object | 
+| ```action()``` | The main runner of the command, will be executed when the index maps the CLI to it. | 
+| ```configure()``` | The configuration of the command, determines argument mapping and the order. Here is where `InputOption` objects are instantiated |
+| ```getArgument(name)``` | Does not need to be implemented, gives access to the value of the mapped argument. (See Input Option section) |
+| ```getOption(name)``` | Does not need to be implemented, gives access to the value of the option. (See Input Option section) |
+
+### Input Option
+All arguments start as `InputOption` objects which handle and validate your inputs.
+
+An argument is the ordered sequence of input after the command name in the CLI. An option is a mapped key-value pair from the CLI and can be added in any order.
+
+The constructor arguments are as follows:
+| Argument | Usage |
+| ----- | ----- |
+| ```name``` | The name of the argument used to access it both programmatically and in the CLI |
+| ```type``` | One of the main pre-defined types in the `InputOption` object. Your input value will be cast to this type | 
+| ```defaultValue``` | The default value the command will recieve if the argument or option isn't given one |
+
+Some extra functionality can be added, for now we can determine if an option is required by setting the required flag using the `isRequired` function. By default no arguments or options are set to required. An exception will be thrown in the event that a required option/argument isn't present.
+
+Any extra and undeclared options will be ignored at runtime.
 
 ## Spinning up commands with the Command Resolver
 The `CommandResolver` encapsulates the necessary logic to turn an index of commands into a powerful namespace that let's you use commmands as classes in any directory you want in the project. NodeJS can run any file so the most convenient way to get a desirable executable path is to create the dedicated commands runner file in the root of your project (or the root of your dev directory that will be transpiled).
@@ -71,25 +99,7 @@ import {commands} from 'tramway-command`;
 let {CommandResolver} = commands;
 import index from './config/commands.js';
 
-(new CommandResolver(index)).run();
+export default (new CommandResolver(index)).run();
 ```
 
 The namespace is determined by the name of the file and you can create multiple namespaces with multiple namespace-specific indexes with the code above. For example, if you wanted to make commands specifically for migrations, you could also add a `migrations.js` file with the command resolver and run migrations via `node migrations someMigrationCommand`.
-
-## Flexible options
-The premise behind the arguments and options template is to provide a simple way to provide flexible arguments.
-
-The following command
-
-```
-node command test-command 4 5 --compare 7 0 --remove 6
-```
-
-will set the parameters of the `TestCommand`'s `action` function to the following:
-
-| parameter | value |
-| ----- | ----- |
-| args | ```[4, 5]``` |
-| options | ```{"compare": [7, 0], "remove": [6]}```|
-
-These arguments are flexible, can be dereferenced and can be treated as function arguments.
