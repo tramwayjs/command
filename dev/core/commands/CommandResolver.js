@@ -8,8 +8,8 @@ export default class CommandResolver {
      * 
      * @param {{}} commands 
      */
-    constructor(commands) {
-        this.commands = commands || {};
+    constructor(commands = {}) {
+        this.commands = commands;
     }
     
     /**
