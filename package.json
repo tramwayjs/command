@@ -1,6 +1,6 @@
 {
   "name": "tramway-command",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A command library allowing the use of classes",
   "author": "Julian Wolfe",
   "license": "MIT",
