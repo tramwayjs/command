@@ -65,6 +65,7 @@ All arguments start as `InputOption` objects which handle and validate your inpu
 An argument is the ordered sequence of input after the command name in the CLI. An option is a mapped key-value pair from the CLI and can be added in any order.
 
 The constructor arguments are as follows:
+
 | Argument | Usage |
 | ----- | ----- |
 | ```name``` | The name of the argument used to access it both programmatically and in the CLI |
