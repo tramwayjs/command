@@ -1,6 +1,6 @@
 {
   "name": "tramway-command",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A command library allowing the use of classes",
   "author": "Julian Wolfe",
   "license": "MIT",
@@ -11,11 +11,11 @@
   "bugs": {
     "url": "https://gitlab.com/tramwayjs/tramway-command/issues?label_name%5B%5D=bug"
   },
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "prepublish": "npm run compile",
-    "compile": "gulp distribute",
-    "test": "gulp distribute && mocha tests"
+    "compile": "./node_modules/.bin/gulp distribute",
+    "test": "./node_modules/.bin/gulp distribute && ./node_modules/.bin/mocha tests"
   },
   "devDependencies": {
     "babel-plugin-transform-flow-strip-types": "^6.14.0",
@@ -27,6 +27,7 @@
     "tramway-core-testsuite": "^1.2.0"
   },
   "dependencies": {
+    "terminal-kit": "^1.19.2",
     "tramway-core": "^1.0.0"
   }
 }
