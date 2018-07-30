@@ -1,6 +1,6 @@
 const assert = require('assert');
 const utils = require('tramway-core-testsuite');
-const lib = require('../index.js');
+const lib = require('../dist/index.js');
 var describeCoreClass = utils.describeCoreClass;
 var describeFunction = utils.describeFunction;
 

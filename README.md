@@ -4,6 +4,7 @@ Tramway Command is a simple CLI building tool to write scripts to accompany a Tr
 2. A flexible way to create multiple namespaces.
 3. An indexing system capable of plugging into tramway-core-dependency-injector and avoiding file clutter
 4. Control of argument names, types and if they're required
+5. Terminal utilities to aide in creating rich terminal applications
 
 # Installation:
 1. `npm install tramway-command`
@@ -104,3 +105,71 @@ export default (new CommandResolver(index)).run();
 ```
 
 The namespace is determined by the name of the file and you can create multiple namespaces with multiple namespace-specific indexes with the code above. For example, if you wanted to make commands specifically for migrations, you could also add a `migrations.js` file with the command resolver and run migrations via `node migrations someMigrationCommand`.
+
+## Terminal Utilities
+Tramway Command implements wrappers for [terminal-kit](https://github.com/cronvel/terminal-kit).
+
+```
+import {terminal} from 'tramway-command';
+```
+
+### Console message formatting
+
+Information:
+Prints a message in blue.
+
+```
+const {Message, TimestampLog} = terminal;
+new Message('message');
+new TimestampLog('message')
+```
+
+Success:
+Prints a message in green.
+
+```
+const {SuccessMessage, TimestampSuccess} = terminal;
+new SuccessMessage('message');
+new TimestampSuccess('message')
+```
+
+Warning:
+Prints a message in yellow.
+
+```
+const {WarningMessage, TimestampWarning} = terminal;
+new WarningMessage('message');
+new TimestampWarning('message')
+```
+
+Error:
+Prints a message in red.
+
+```
+const {ErrorMessage, TimestampError} = terminal;
+new ErrorMessage('message');
+new TimestampError('message')
+```
+
+### Progress Bar
+
+```
+const {ProgressBar} = terminal;
+```
+
+| Argument | Usage |
+| ----- | ----- |
+| ```title``` | The name of the argument used to access it both programmatically and in the CLI |
+| ```items``` | One of the main pre-defined types in the `InputOption` object. Your input value will be cast to this type | 
+| ```options``` | The default value the command will recieve if the argument or option isn't given one |
+
+The `ProgressBar` includes the following methods:
+
+| Function | Usage |
+| ----- | ----- |
+| ```start(task: string)``` | Starts a task, increments progress |
+| ```finish(task: string)``` | Finishes a task, increments progress |
+| ```pause()``` | Pauses the current progress bar |
+| ```resume()``` | Resumes the progress bar from the state it left off |
+| ```isComplete(): boolean``` | Determine if the progress bar is at 100% |
+

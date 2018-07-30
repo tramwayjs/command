@@ -5,3 +5,4 @@ core/**/*.js.map
 *.js.map
 /test.js
 /command.js
+dist/
