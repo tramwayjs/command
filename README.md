@@ -21,7 +21,7 @@ https://gitlab.com/tramwayjs/tramway-command-example
 ## Config
 The config file for commands will contain a JSON hashmap of commands to a string representation.
 
-```
+```javascript
 import TestCommand from '../commands/TestCommand';
 export default {
     "test:command": TestCommand
@@ -33,7 +33,7 @@ Commands let you perform and automate tasks or create helpful utilities without 
 
 To create a command, import the class and implement a derived class with the abstracted stubs to get the most out of it. 
 
-```
+```javascript
 import {Command, commands} from 'tramway-command';
 let {InputOption} = commands;
 
@@ -96,7 +96,7 @@ You will need to create a `command.js` file in the `dev` directory of a typical 
 
 Inside the `command.js` file, you will want to import the index, instantiate the Command Resolver and run it.
 
-```
+```javascript
 import {commands} from 'tramway-command`;
 let {CommandResolver} = commands;
 import index from './config/commands.js';
@@ -106,10 +106,40 @@ export default (new CommandResolver(index)).run();
 
 The namespace is determined by the name of the file and you can create multiple namespaces with multiple namespace-specific indexes with the code above. For example, if you wanted to make commands specifically for migrations, you could also add a `migrations.js` file with the command resolver and run migrations via `node migrations someMigrationCommand`.
 
+### Extending the CommandResolver
+The `CommandResolver` will try to build command classes from its internal mapping in the `command.js` by default, using a `CommandFactory`. The default setup is convenient when `tramway-command` is used as a standalone solution but it can be limiting when used with other Tramway components, notably `tramway-core-dependency-injector`. The Command Resolver takes a second argument in the constructor to allow for custom Command factories to be used instead of the default one, like `tramway-command-di-factory` if you want to leverage the dependency injection library.
+
+Example:
+
+```javascript
+import DICommandFactory from 'tramway-command-di-factory';
+export default (new CommandResolver(index, new DICommandFactory())).run();
+```
+
+Note that the above code snippet can be implemented as a core service in your dependency injection config.
+
+```javascript
+import CommandResolver from 'tramway-command';
+import DICommandFactory from 'tramway-command-di-factory';
+
+export default {
+    "app": {
+        "class": CommandResolver,
+        "constructor": [
+            {"type": "parameter", "key": "commands"},
+            {"type": "service", "key": "factory.command"},
+        ],
+    },
+    "factory.command": {
+        "class": DICommandFactory,
+    }
+}
+```
+
 ## Terminal Utilities
 Tramway Command implements wrappers for [terminal-kit](https://github.com/cronvel/terminal-kit).
 
-```
+```javascript
 import {terminal} from 'tramway-command';
 ```
 
@@ -118,7 +148,7 @@ import {terminal} from 'tramway-command';
 Information:
 Prints a message in blue.
 
-```
+```javascript
 const {Message, TimestampLog} = terminal;
 new Message('message');
 new TimestampLog('message')
@@ -127,7 +157,7 @@ new TimestampLog('message')
 Success:
 Prints a message in green.
 
-```
+```javascript
 const {SuccessMessage, TimestampSuccess} = terminal;
 new SuccessMessage('message');
 new TimestampSuccess('message')
@@ -136,7 +166,7 @@ new TimestampSuccess('message')
 Warning:
 Prints a message in yellow.
 
-```
+```javascript
 const {WarningMessage, TimestampWarning} = terminal;
 new WarningMessage('message');
 new TimestampWarning('message')
@@ -145,7 +175,7 @@ new TimestampWarning('message')
 Error:
 Prints a message in red.
 
-```
+```javascript
 const {ErrorMessage, TimestampError} = terminal;
 new ErrorMessage('message');
 new TimestampError('message')
@@ -153,7 +183,7 @@ new TimestampError('message')
 
 ### Progress Bar
 
-```
+```javascript
 const {ProgressBar} = terminal;
 ```
 

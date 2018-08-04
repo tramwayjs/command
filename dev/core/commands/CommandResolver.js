@@ -2,14 +2,16 @@ import Command from '../Command';
 import {errors} from 'tramway-core';
 let {WrongTypeError} = errors;
 import InputResolver from './InputResolver';
+import { CommandFactory } from '../factories';
 
 export default class CommandResolver {
     /**
      * 
      * @param {{}} commands 
+     * @param {CommandFactory} factory
      */
-    constructor(commands = {}) {
-        this.commands = commands;
+    constructor(commands = {}, factory) {
+        this.factory = factory || new CommandFactory(commands);
     }
     
     /**
@@ -21,7 +23,8 @@ export default class CommandResolver {
         let options = this.getOptions(args);
 
         try {
-            let command = new this.commands[commandName]();
+            let command = this.factory.create(commandName);
+
             if (!(command instanceof Command)) {
                 throw new WrongTypeError(Command.name);
             } else {
