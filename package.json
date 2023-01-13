@@ -27,7 +27,7 @@
     "tramway-core-testsuite": "^1.2.0"
   },
   "dependencies": {
-    "terminal-kit": "^1.19.2",
+    "terminal-kit": "^2.1.8",
     "tramway-core": "^1.0.0"
   }
 }
